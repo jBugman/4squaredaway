@@ -19,7 +19,7 @@ from .log import get_logger
 NEAR = 'Москва'
 
 app = Flask(
-    '4sqaredaway',
+    '4squaredaway',
     template_folder='templates',
     static_folder='static'
 )
@@ -30,7 +30,7 @@ fsq = Foursquare(
     client_id=FOURSQUARE_CLIENT_ID,
     client_secret=FOURSQUARE_CLIENT_SECRET
 )
-logger = get_logger('4sqaredaway')
+logger = get_logger('4squaredaway')
 
 
 @app.route('/favicon.ico')
