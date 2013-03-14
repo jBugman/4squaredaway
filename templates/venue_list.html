@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>4sqaredaway</title>
+<style>
+	table {
+		border-collapse: collapse;
+	}
+	td, th {
+		border: 1px solid #333;
+		padding: 3px;
+	}
+	ul {
+		margin: 5px 5px 10px 0;
+	}
+	img {
+		width: 32px;
+		height: 32px;
+	}
+</style>
+<table>
+	<tr>
+		<th></th>
+		<th>Name</th>
+		<th>Checkins</th>
+		<th>Users</th>
+		<th>Location</th>
+	</tr>
+	{% for venue in venues %}
+	<tr>
+		<td>
+			{% for cat in venue['categories'] %}
+			<img src="{{ cat['icon']['prefix'] }}bg_32{{ cat['icon']['suffix'] }}" title="{{ cat['name'] }}">
+			{% endfor %}
+		</td>
+		<td><a href="{{ venue['canonicalUrl'] }}">{{ venue['name'] }}</td>
+		<td>{{ venue['stats']['checkinsCount'] }}</td>
+		<td>{{ venue['stats']['usersCount'] }}</td>
+		<td>{{ venue['location']['city'] }}</td>
+	</tr>
+	{% endfor %}
+<table>
