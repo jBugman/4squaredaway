@@ -1,6 +1,8 @@
 # -*- coding: UTF-8 -*-
 import time
 import json
+from cStringIO import StringIO
+import csv
 
 from flask import (
     Flask, Response,
@@ -59,14 +61,17 @@ def search_with_intent(search_term, intent='match', near=NEAR):
 
 @app.route('/search/<name>')
 def venue_search(name):
-    as_json = request.args.get('json', False)
+    format = request.args.get('format', 'html')
+    logger.debug('Search \'%s\' format=%s' % (name, format))
     result = search_with_intent(name, intent='browse')
-    if as_json:
+
+    if format == 'json':
         return Response(
             json.dumps(result['venues'], indent=2),
             mimetype='application/json'
         )
-    else:
+
+    if format == 'html':
         def venue_comparator(venue):
             if 'categories' in venue and venue['categories']:
                 return venue['categories'][0]['name']
@@ -75,4 +80,25 @@ def venue_search(name):
         return render_template(
             'venue_list.html',
             venues=sorted(result['venues'], key=venue_comparator)
+        )
+
+    if format == 'csv':
+        si = StringIO()
+        cw = csv.writer(si, dialect=csv.excel)
+        for venue in result['venues']:
+            cw.writerow([
+                venue['name'].encode('UTF-8'),
+                ';'.join((x['name'] for x in venue['categories'])).encode('UTF-8'),
+                venue['stats']['checkinsCount'],
+                venue['stats']['usersCount'],
+                venue['stats']['tipCount'],
+                venue['likes']['count'],
+                venue['specials']['count'],
+                venue['location'].get('city', '').encode('UTF-8'),
+                venue['location'].get('address', '').encode('UTF-8'),
+                venue['id'].encode('UTF-8'),
+            ])
+        return Response(
+            si.getvalue().decode('UTF-8').encode('cp1251', 'replace'),
+            content_type='text/csv; charset=cp1251'
         )

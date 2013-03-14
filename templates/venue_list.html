@@ -24,6 +24,9 @@
 		<th>Name</th>
 		<th>Checkins</th>
 		<th>Users</th>
+		<th>Tips</th>
+		<th>Likes</th>
+		<th>Specials</th>
 		<th>Location</th>
 	</tr>
 	{% for venue in venues %}
@@ -36,7 +39,10 @@
 		<td><a href="{{ venue['canonicalUrl'] }}">{{ venue['name'] }}</td>
 		<td>{{ venue['stats']['checkinsCount'] }}</td>
 		<td>{{ venue['stats']['usersCount'] }}</td>
-		<td>{{ venue['location']['city'] }}</td>
+		<td>{{ venue['stats']['tipCount'] }}</td>
+		<td>{{ venue['likes']['count'] }}</td>
+		<td>{{ venue['specials']['count'] }}</td>
+		<td>{{ venue['location']['city'] }} {{ venue['location']['address'] }}</td>
 	</tr>
 	{% endfor %}
 <table>
