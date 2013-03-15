@@ -9,11 +9,12 @@ from flask import (
 from flask.ext.cache import Cache
 from foursquare import Foursquare
 
-from .config import (
+from fsqaway.config import (
     FOURSQUARE_CLIENT_ID, FOURSQUARE_CLIENT_SECRET,
     SEARCH_CACHE_TIMEOUT, CATEGORIES_LIST_CACHE_TIMEOUT
 )
-from .log import get_logger
+from fsqaway.log import get_logger
+from fsqaway.models import Venue
 
 
 NEAR = 'Москва'
@@ -85,20 +86,9 @@ def venue_search(name):
             for row in data:
                 yield '\t'.join((unicode(x) for x in row)) + '\n'
 
-        return Response(generate_csv((
-            [
-                venue['name'],
-                ';'.join((x['name'] for x in venue['categories'])),
-                venue['stats']['checkinsCount'],
-                venue['stats']['usersCount'],
-                venue['stats']['tipCount'],
-                venue['likes']['count'],
-                venue['specials']['count'],
-                venue['location'].get('city', ''),
-                venue['location'].get('address', ''),
-                venue['id'],
-            ] for venue in result['venues']
-        )), mimetype='text/csv')
+        return Response(generate_csv(
+            list(Venue(venue)) for venue in result['venues']
+        ), mimetype='text/csv')
 
 
 @cache.cached(timeout=CATEGORIES_LIST_CACHE_TIMEOUT)
