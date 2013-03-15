@@ -13,7 +13,7 @@ from foursquare import Foursquare
 
 from .config import (
     FOURSQUARE_CLIENT_ID, FOURSQUARE_CLIENT_SECRET,
-    SEARCH_CACHE_TIMEOUT
+    SEARCH_CACHE_TIMEOUT, CATEGORIES_LIST_CACHE_TIMEOUT
 )
 from .log import get_logger
 
@@ -48,7 +48,7 @@ def index():
     return '4sqaredaway'
 
 
-@cache.memoize(SEARCH_CACHE_TIMEOUT)
+@cache.memoize(timeout=SEARCH_CACHE_TIMEOUT)
 def search_with_intent(search_term, intent='match', near=NEAR):
     logger.debug('API call \'%s\' intent=%s' % (search_term, intent))
     return fsq.venues.search(params={
@@ -102,3 +102,52 @@ def venue_search(name):
             si.getvalue().decode('UTF-8').encode('cp1251', 'replace'),
             content_type='text/csv; charset=cp1251'
         )
+
+
+@cache.cached(timeout=CATEGORIES_LIST_CACHE_TIMEOUT)
+def get_categories():
+    logger.debug('API call \'Categories\'')
+    return fsq.venues.categories()['categories']
+
+
+def filter_categories(categories):
+    result = []
+    for c in categories:
+        if 'Residence' not in c['name']:
+            c.pop('categories', None)
+            result.append(c)
+        else:
+            for sub_c in c['categories']:
+                if 'Home (private)' not in sub_c['name']:
+                    sub_c.pop('categories', None)
+                    result.append(sub_c)
+    return result
+
+
+def cleanup_categories(categories):
+    for c in categories:
+        c.pop('pluralName', None)
+        c.pop('shortName', None)
+        icon = c.pop('icon', None)
+        if icon:
+            c['icon'] = icon['prefix'] + 'bg_32' + icon['suffix']
+        if 'categories' in c:
+            cleanup_categories(c['categories'])
+            if not c['categories']:
+                c.pop('categories', None)
+    return categories
+
+
+@app.route('/dev/categories')
+def categories_tree():
+    filtered = request.args.get('filter', False)
+
+    result = cleanup_categories(get_categories())
+
+    if filtered:
+        result = filter_categories(result)
+
+    return Response(
+        json.dumps(result, indent=2),
+        mimetype='application/json'
+    )
