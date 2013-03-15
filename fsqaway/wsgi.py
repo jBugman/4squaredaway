@@ -7,17 +7,11 @@ from flask import (
     abort, render_template, request, redirect, url_for
 )
 from flask.ext.cache import Cache
-from foursquare import Foursquare
 
-from fsqaway.config import (
-    FOURSQUARE_CLIENT_ID, FOURSQUARE_CLIENT_SECRET,
-    SEARCH_CACHE_TIMEOUT, CATEGORIES_LIST_CACHE_TIMEOUT
-)
 from fsqaway.log import get_logger
-from fsqaway.models import Venue
+from fsqaway.models import Venue, Category
+from fsqaway.foursquare_api import FoursquareAPI
 
-
-NEAR = 'Москва'
 
 app = Flask(
     '4squaredaway',
@@ -27,10 +21,7 @@ app = Flask(
 app.logger.handlers = []
 app.config.from_object('fsqaway.config')
 cache = Cache(app, with_jinja2_ext=False)
-fsq = Foursquare(
-    client_id=FOURSQUARE_CLIENT_ID,
-    client_secret=FOURSQUARE_CLIENT_SECRET
-)
+api = FoursquareAPI(cache)
 logger = get_logger('4squaredaway')
 
 
@@ -47,26 +38,10 @@ def index():
     return '4sqaredaway'
 
 
-@cache.memoize(timeout=SEARCH_CACHE_TIMEOUT)
-def search_with_intent(search_term, intent='match', near=NEAR):
-    logger.debug('API call \'%s\' intent=%s' % (search_term, intent))
-    return fsq.venues.search(params={
-        'intent': intent,
-        'near': NEAR,
-        'query': search_term.encode('UTF-8'),
-        'limit': 50
-    })
-
-
-@app.route('/search/<name>')
-def venue_search(name):
-    format = request.args.get('format', 'html')
-    logger.debug('Search \'%s\' format=%s' % (name, format))
-    result = search_with_intent(name, intent='browse')
-
+def render_venue_list(venues, format):
     if format == 'json':
         return Response(
-            json.dumps(result['venues'], indent=2),
+            json.dumps(venues, indent=2),
             mimetype='application/json'
         )
 
@@ -78,7 +53,7 @@ def venue_search(name):
                 return ''
         return render_template(
             'venue_list.html',
-            venues=sorted(result['venues'], key=venue_comparator)
+            venues=sorted(venues, key=venue_comparator)
         )
 
     if format == 'csv':
@@ -87,14 +62,16 @@ def venue_search(name):
                 yield '\t'.join((unicode(x) for x in row)) + '\n'
 
         return Response(generate_csv(
-            list(Venue(venue)) for venue in result['venues']
-        ), mimetype='text/csv')
+            list(Venue(venue)) for venue in venues
+        ), mimetype='text/plain')
 
 
-@cache.cached(timeout=CATEGORIES_LIST_CACHE_TIMEOUT)
-def get_categories():
-    logger.debug('API call \'Categories\'')
-    return fsq.venues.categories()['categories']
+@app.route('/search/<name>')
+def venue_search(name):
+    format = request.args.get('format', 'html')
+    logger.debug('Search \'%s\' format=%s' % (name, format))
+    result = api.search_with_intent(name, intent='browse')
+    return render_venue_list(result['venues'], format)
 
 
 def filter_categories(categories):
@@ -128,13 +105,15 @@ def cleanup_categories(categories):
 @app.route('/dev/categories')
 def categories_tree():
     filtered = request.args.get('filter', False)
-
-    result = cleanup_categories(get_categories())
+    categories = api.get_categories()
+    # result = [Category(x) for x in categories]
+    result = cleanup_categories(categories)
 
     if filtered:
         result = filter_categories(result)
 
     return Response(
         json.dumps(result, indent=2),
+        # result,
         mimetype='application/json'
     )
