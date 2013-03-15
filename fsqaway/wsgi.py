@@ -1,8 +1,6 @@
 # -*- coding: UTF-8 -*-
 import time
 import json
-from cStringIO import StringIO
-import csv
 
 from flask import (
     Flask, Response,
@@ -83,25 +81,24 @@ def venue_search(name):
         )
 
     if format == 'csv':
-        si = StringIO()
-        cw = csv.writer(si, dialect=csv.excel)
-        for venue in result['venues']:
-            cw.writerow([
-                venue['name'].encode('UTF-8'),
-                ';'.join((x['name'] for x in venue['categories'])).encode('UTF-8'),
+        def generate_csv(data):
+            for row in data:
+                yield '\t'.join((unicode(x) for x in row)) + '\n'
+
+        return Response(generate_csv((
+            [
+                venue['name'],
+                ';'.join((x['name'] for x in venue['categories'])),
                 venue['stats']['checkinsCount'],
                 venue['stats']['usersCount'],
                 venue['stats']['tipCount'],
                 venue['likes']['count'],
                 venue['specials']['count'],
-                venue['location'].get('city', '').encode('UTF-8'),
-                venue['location'].get('address', '').encode('UTF-8'),
-                venue['id'].encode('UTF-8'),
-            ])
-        return Response(
-            si.getvalue().decode('UTF-8').encode('cp1251', 'replace'),
-            content_type='text/csv; charset=cp1251'
-        )
+                venue['location'].get('city', ''),
+                venue['location'].get('address', ''),
+                venue['id'],
+            ] for venue in result['venues']
+        )), mimetype='text/csv')
 
 
 @cache.cached(timeout=CATEGORIES_LIST_CACHE_TIMEOUT)
