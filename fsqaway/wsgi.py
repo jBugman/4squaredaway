@@ -13,6 +13,8 @@ from fsqaway.models import Venue, Category
 from fsqaway.foursquare_api import FoursquareAPI
 
 
+ITERATIONS = 10
+
 app = Flask(
     '4squaredaway',
     template_folder='templates',
@@ -70,8 +72,8 @@ def render_venue_list(venues, format):
 def venue_search(name):
     format = request.args.get('format', 'html')
     logger.debug('Search \'%s\' format=%s' % (name, format))
-    result = api.search_with_intent(name, intent='browse')
-    return render_venue_list(result['venues'], format)
+    result = api.batch_search(name, ITERATIONS)
+    return render_venue_list(result, format)
 
 
 def filter_categories(categories):
