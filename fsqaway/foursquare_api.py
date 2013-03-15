@@ -8,6 +8,7 @@ from fsqaway.config import (
     FOURSQUARE_CLIENT_ID, FOURSQUARE_CLIENT_SECRET,
     SEARCH_CACHE_TIMEOUT, CATEGORIES_LIST_CACHE_TIMEOUT
 )
+from fsqaway.models import Category
 
 
 SEARCH_INTENT = 'browse'
@@ -25,22 +26,29 @@ class FoursquareAPI(object):
         )
         self.cache = cache
 
-    def batch_search(self, search_term, iterations):
+    def batch_search(self, search_term, iterations, filter):
         result = []
         for i in range(iterations):
-            result.append(self.search(search_term).get('venues', []))
+            result.append(self.search(search_term, filter).get('venues', []))
         return [item for sublist in result for item in sublist]  # flatten
 
-    def search(self, search_term):
+    def search(self, search_term, filter=False):
         coords = ','.join((str(x) for x in self.get_random_coords()))
         self.logger.debug('API call \'%s\' coords=%s' % (search_term, coords))
-        return self.fsq.venues.search(params={
+        params = {
             'intent': SEARCH_INTENT,
             'll': coords,
             'radius': SEARCH_RADIUS,
             'query': search_term.encode('UTF-8'),
             'limit': 50
-        })
+        }
+        if filter:
+            params['categoryId'] = ','.join(
+                (x['id'] for x in Category.filter(
+                    Category.cleanup(self.get_categories())
+                ))
+            )
+        return self.fsq.venues.search(params=params)
 
     def get_categories(self):
         @self.cache.cached(timeout=CATEGORIES_LIST_CACHE_TIMEOUT)

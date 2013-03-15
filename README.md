@@ -1,3 +1,18 @@
+## Поиск
+
+Все типы venues:
+
+    /search/{запрос}
+
+Без private home:
+
+    /filter/{запрос}
+
+Дополнительные GET-параметры:
+
+* `format=json|csv`
+* `iterations=n` — количество запросов в батче
+
 ## Выгрузка данных в CSV
 
     /search/{запрос}?format=csv
@@ -14,8 +29,7 @@
 * location.city
 * location.address
 * id
-
-Из-за кодирования в cp1251 cтранные символы заменяются на '?'
+* 'relevance'
 
 
 ## Категории

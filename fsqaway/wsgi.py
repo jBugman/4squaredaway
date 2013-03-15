@@ -71,37 +71,19 @@ def render_venue_list(venues, format):
 @app.route('/search/<name>')
 def venue_search(name):
     format = request.args.get('format', 'html')
-    logger.debug('Search \'%s\' format=%s' % (name, format))
-    result = api.batch_search(name, ITERATIONS)
+    iterations = int(request.args.get('iterations', ITERATIONS))
+    logger.debug('Search \'%s\' format=%s n=%d' % (name, format, iterations))
+    result = api.batch_search(name, iterations, filter=False)
     return render_venue_list(result, format)
 
 
-def filter_categories(categories):
-    result = []
-    for c in categories:
-        if 'Residence' not in c['name']:
-            c.pop('categories', None)
-            result.append(c)
-        else:
-            for sub_c in c['categories']:
-                if 'Home (private)' not in sub_c['name']:
-                    sub_c.pop('categories', None)
-                    result.append(sub_c)
-    return result
-
-
-def cleanup_categories(categories):
-    for c in categories:
-        c.pop('pluralName', None)
-        c.pop('shortName', None)
-        icon = c.pop('icon', None)
-        if icon:
-            c['icon'] = icon['prefix'] + 'bg_32' + icon['suffix']
-        if 'categories' in c:
-            cleanup_categories(c['categories'])
-            if not c['categories']:
-                c.pop('categories', None)
-    return categories
+@app.route('/filter/<name>')
+def venue_filter(name):
+    format = request.args.get('format', 'html')
+    iterations = int(request.args.get('iterations', ITERATIONS))
+    logger.debug('Filter \'%s\' format=%s n=%d' % (name, format, iterations))
+    result = api.batch_search(name, iterations, filter=True)
+    return render_venue_list(result, format)
 
 
 @app.route('/dev/categories')
@@ -109,10 +91,10 @@ def categories_tree():
     filtered = request.args.get('filter', False)
     categories = api.get_categories()
     # result = [Category(x) for x in categories]
-    result = cleanup_categories(categories)
+    result = Category.cleanup(categories)
 
     if filtered:
-        result = filter_categories(result)
+        result = Category.filter(result)
 
     return Response(
         json.dumps(result, indent=2),
