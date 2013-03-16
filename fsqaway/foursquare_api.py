@@ -42,7 +42,11 @@ class FoursquareAPI(object):
             ).get('venues', []),
             range(iterations)
         )
-        return [item for sublist in result for item in sublist]  # flatten
+        # Flatten mapped list and remove duplicates via temp dict
+        return {
+            x['id']: x for x in
+            [item for sublist in result for item in sublist]
+        }.values()
 
     def search(self, search_term, filter=None):
         coords = ','.join((str(x) for x in self.get_random_coords()))
