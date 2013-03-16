@@ -8,7 +8,6 @@ from fsqaway.log import get_logger
 from fsqaway.config import (
     FOURSQUARE_CLIENT_ID, FOURSQUARE_CLIENT_SECRET,
     CATEGORIES_LIST_CACHE_TIMEOUT,
-    # SEARCH_CACHE_TIMEOUT,
     GEVENT_POOL_SIZE,
 )
 from fsqaway.models import Category

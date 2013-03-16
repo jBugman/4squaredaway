@@ -72,23 +72,3 @@ class Category(object):
                         sub_c.pop('categories', None)
                         result.append(sub_c)
         return result
-
-    # def __repr__(self):
-    #     return json.dumps({
-    #         'name': self.name,
-    #         'id': self.id,
-    #         'categories': len(self.categories)#[(x) for x in self.categories]
-    #     })
-
-    # def _cleanup(self, category):
-    #     category.pop('pluralName', None)
-    #     category.pop('shortName', None)
-    #     icon = category.pop('icon', None)
-    #     if icon:
-    #         category['icon'] = icon['prefix'] + 'bg_32' + icon['suffix']
-    #     if 'categories' in category:
-    #         for c in category['categories']:
-    #             self._cleanup(c)
-    #         if not category['categories']:
-    #             category.pop('categories', None)
-    #     return category

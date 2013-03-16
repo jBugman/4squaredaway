@@ -2,7 +2,6 @@
 from gevent import monkey
 monkey.patch_all()
 
-import time
 import json
 
 from flask import (
@@ -102,7 +101,6 @@ def venue_filter(name):
 def categories_tree():
     filtered = request.args.get('filter', False)
     categories = FoursquareAPI(cache).get_categories()
-    # result = [Category(x) for x in categories]
     result = Category.cleanup(categories)
 
     if filtered:
@@ -110,6 +108,5 @@ def categories_tree():
 
     return Response(
         json.dumps(result, indent=2),
-        # result,
         mimetype='application/json'
     )
