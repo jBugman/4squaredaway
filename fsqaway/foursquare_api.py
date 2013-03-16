@@ -2,11 +2,14 @@
 import random
 
 from foursquare import Foursquare
+from gevent.pool import Pool
 
 from fsqaway.log import get_logger
 from fsqaway.config import (
     FOURSQUARE_CLIENT_ID, FOURSQUARE_CLIENT_SECRET,
-    SEARCH_CACHE_TIMEOUT, CATEGORIES_LIST_CACHE_TIMEOUT
+    CATEGORIES_LIST_CACHE_TIMEOUT,
+    # SEARCH_CACHE_TIMEOUT,
+    GEVENT_POOL_SIZE,
 )
 from fsqaway.models import Category
 
@@ -27,12 +30,22 @@ class FoursquareAPI(object):
         self.cache = cache
 
     def batch_search(self, search_term, iterations, filter):
-        result = []
-        for i in range(iterations):
-            result.append(self.search(search_term, filter).get('venues', []))
+        pool = Pool(GEVENT_POOL_SIZE)
+        categories_filter = ','.join(
+            (x['id'] for x in Category.filter(
+                Category.cleanup(self.get_categories())
+            ))
+        )
+        result = pool.map(
+            lambda x: self.search(
+                search_term,
+                categories_filter
+            ).get('venues', []),
+            range(iterations)
+        )
         return [item for sublist in result for item in sublist]  # flatten
 
-    def search(self, search_term, filter=False):
+    def search(self, search_term, filter=None):
         coords = ','.join((str(x) for x in self.get_random_coords()))
         self.logger.debug('API call \'%s\' coords=%s' % (search_term, coords))
         params = {
@@ -43,11 +56,7 @@ class FoursquareAPI(object):
             'limit': 50
         }
         if filter:
-            params['categoryId'] = ','.join(
-                (x['id'] for x in Category.filter(
-                    Category.cleanup(self.get_categories())
-                ))
-            )
+            params['categoryId'] = filter
         return self.fsq.venues.search(params=params)
 
     def get_categories(self):

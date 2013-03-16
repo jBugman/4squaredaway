@@ -11,5 +11,9 @@ foursquare==20130212
 httplib2==0.8
 poster==0.8.1
 
+Cython==0.18
+https://github.com/SiteSupport/gevent/archive/1.0rc2.tar.gz#egg=gevent
+greenlet==0.4.0
+
 raven==3.1.11
 blinker==1.2
