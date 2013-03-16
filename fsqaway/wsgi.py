@@ -27,7 +27,7 @@ app.logger.handlers = []
 app.config.from_object('fsqaway.config')
 basic_auth = BasicAuth(app)
 cache = Cache(app, with_jinja2_ext=False)
-logger = get_logger('4squaredaway')
+logger = get_logger(__name__)
 
 
 @app.route('/favicon.ico')
