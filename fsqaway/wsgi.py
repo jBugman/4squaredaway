@@ -1,4 +1,7 @@
 # -*- coding: UTF-8 -*-
+from gevent import monkey
+monkey.patch_all()
+
 import time
 import json
 
@@ -23,7 +26,6 @@ app = Flask(
 app.logger.handlers = []
 app.config.from_object('fsqaway.config')
 cache = Cache(app, with_jinja2_ext=False)
-api = FoursquareAPI(cache)
 logger = get_logger('4squaredaway')
 
 
@@ -37,7 +39,17 @@ def favicon():
 
 @app.route('/')
 def index():
-    return '4sqaredaway'
+    return Response(
+        '''
+      _  _                                      _
+     | || |  ___  __ _ _   _  __ _ _ __ ___  __| | __ ___      ____ _ _   _
+     | || |_/ __|/ _` | | | |/ _` | '__/ _ \/ _` |/ _` \ \ /\ / / _` | | | |
+     |__   _\__ \ (_| | |_| | (_| | | |  __/ (_| | (_| |\ V  V / (_| | |_| |
+        |_| |___/\__, |\__,_|\__,_|_|  \___|\__,_|\__,_| \_/\_/ \__,_|\__, |
+                    |_|                                               |___/
+        ''',
+        mimetype='text/plain'
+    )
 
 
 def render_venue_list(venues, format):
@@ -73,7 +85,7 @@ def venue_search(name):
     format = request.args.get('format', 'html')
     iterations = int(request.args.get('iterations', ITERATIONS))
     logger.debug('Search \'%s\' format=%s n=%d' % (name, format, iterations))
-    result = api.batch_search(name, iterations, filter=False)
+    result = FoursquareAPI(cache).batch_search(name, iterations, filter=False)
     return render_venue_list(result, format)
 
 
@@ -82,14 +94,14 @@ def venue_filter(name):
     format = request.args.get('format', 'html')
     iterations = int(request.args.get('iterations', ITERATIONS))
     logger.debug('Filter \'%s\' format=%s n=%d' % (name, format, iterations))
-    result = api.batch_search(name, iterations, filter=True)
+    result = FoursquareAPI(cache).batch_search(name, iterations, filter=True)
     return render_venue_list(result, format)
 
 
 @app.route('/dev/categories')
 def categories_tree():
     filtered = request.args.get('filter', False)
-    categories = api.get_categories()
+    categories = FoursquareAPI(cache).get_categories()
     # result = [Category(x) for x in categories]
     result = Category.cleanup(categories)
 
