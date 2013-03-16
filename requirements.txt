@@ -17,3 +17,5 @@ greenlet==0.4.0
 
 raven==3.1.11
 blinker==1.2
+
+Flask-BasicAuth==0.1.0

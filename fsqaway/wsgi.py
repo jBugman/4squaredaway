@@ -8,6 +8,7 @@ from flask import (
     Flask, Response,
     abort, render_template, request, redirect, url_for
 )
+from flask.ext.basicauth import BasicAuth
 from flask.ext.cache import Cache
 
 from fsqaway.log import get_logger
@@ -24,6 +25,7 @@ app = Flask(
 )
 app.logger.handlers = []
 app.config.from_object('fsqaway.config')
+basic_auth = BasicAuth(app)
 cache = Cache(app, with_jinja2_ext=False)
 logger = get_logger('4squaredaway')
 
@@ -80,6 +82,7 @@ def render_venue_list(venues, format):
 
 
 @app.route('/search/<name>')
+@basic_auth.required
 def venue_search(name):
     format = request.args.get('format', 'html')
     iterations = int(request.args.get('iterations', ITERATIONS))
@@ -89,6 +92,7 @@ def venue_search(name):
 
 
 @app.route('/filter/<name>')
+@basic_auth.required
 def venue_filter(name):
     format = request.args.get('format', 'html')
     iterations = int(request.args.get('iterations', ITERATIONS))
@@ -98,6 +102,7 @@ def venue_filter(name):
 
 
 @app.route('/dev/categories')
+@basic_auth.required
 def categories_tree():
     filtered = request.args.get('filter', False)
     categories = FoursquareAPI(cache).get_categories()

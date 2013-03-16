@@ -13,6 +13,11 @@
 * `format=json|csv`
 * `iterations=n` — количество запросов в батче
 
+## Доступ
+
+    Login: 4sq
+    Password: dev1-
+
 ## Выгрузка данных в CSV
 
     /search/{запрос}?format=csv
