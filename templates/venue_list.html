@@ -34,7 +34,7 @@
 		<th>Location</th>
 	</tr>
 	{% for venue in venues %}
-	<tr{% if venue.relevance >= THRESHOLD %} class="irrelevant"{% endif %}>
+	<tr{% if venue.relevance > THRESHOLD %} class="irrelevant"{% endif %}>
 		<td>
 			<img src="{{ venue.icon }}" title="{{ venue.categories }}">
 		</td>

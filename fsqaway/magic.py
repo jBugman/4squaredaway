@@ -32,8 +32,8 @@ class Magic(object):
             [item for sublist in result for item in sublist]
         }.values()
         venues = [self.with_relevance(Venue(x)) for x in raw_venues]
-        venues.sort(key=attrgetter('checkins'))
-        venues.sort(key=attrgetter('relevance'))
+        venues.sort(key=attrgetter('checkins'), reverse=True)
+        venues.sort(key=attrgetter('relevance'), reverse=True)
         return venues
 
     def with_relevance(self, venue):
