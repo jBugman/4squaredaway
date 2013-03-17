@@ -37,13 +37,18 @@ magic = Magic()
 def favicon():
     return redirect(url_for(
         'static',
-        filename='poweredByFoursquare_16x16.png'
+        filename='img/poweredByFoursquare_16x16.png'
     ))
 
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/bootstrap/')
+def bootstrap():
+    return render_template('magic.html')
 
 
 def render_venue_list(venues, format):

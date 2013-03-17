@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+		<meta charset="utf-8">
+		<title>{% block title %}4squaredaway{% endblock %}</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<!-- <meta name="description" content=""> -->
+		<!-- <meta name="author" content=""> -->
+		<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
+		<style>
+			body {padding-top: 60px;}
+		</style>
+		<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-responsive.min.css" rel="stylesheet">
+		<link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+
+		<!--[if lt IE 9]><script src="../assets/js/html5shiv.js"></script><![endif]-->
+
+		<link rel="shortcut icon" href="{{ url_for('static', filename='img/poweredByFoursquare_16x16.png') }}">
+	</head>
+	<body>
+		<div class="navbar navbar-inverse navbar-fixed-top">
+			<div class="navbar-inner">
+				<div class="container">
+					<button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="brand fsq-brand" href="/">4squaredaway</a>
+					<div class="nav-collapse collapse">
+						<ul class="nav">
+							<li class=""><a href="{{ url_for('venue_magic') }}">По-волшебству</a></li>
+						</ul>
+						<p class="navbar-text pull-right">
+							<img class="user-avatar" src="http://www.gravatar.com/avatar/1751847584b94e0027e5a2feb1921550.png?size=32">
+							<a href="#/user" class="navbar-link">Sergey Parshukov</a>
+						</p>
+						<p class="navbar__legal navbar-text pull-right">
+							<a href="#/legal" class="navbar-link">Пользовательское соглашение</a>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="container">
+		{% block content %}{% endblock %}
+		</div>
+	</body>
+	<script src="//yandex.st/jquery/1.9.1/jquery.min.js"></script>
+	<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+</html>
