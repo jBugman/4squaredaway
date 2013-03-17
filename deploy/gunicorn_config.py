@@ -6,7 +6,7 @@ from fsqaway.config import HTTP_PORT
 
 proc_name = '4sq'
 pidfile = '/tmp/4sq.pid'
-daemon = True
+daemon = False  # For supervisord
 
 workers = multiprocessing.cpu_count() * 2 + 1
 bind = ':' + str(HTTP_PORT)
