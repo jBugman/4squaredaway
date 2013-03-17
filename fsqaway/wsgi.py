@@ -43,17 +43,7 @@ def favicon():
 
 @app.route('/')
 def index():
-    return Response(
-        '''
-      _  _                                      _
-     | || |  ___  __ _ _   _  __ _ _ __ ___  __| | __ ___      ____ _ _   _
-     | || |_/ __|/ _` | | | |/ _` | '__/ _ \/ _` |/ _` \ \ /\ / / _` | | | |
-     |__   _\__ \ (_| | |_| | (_| | | |  __/ (_| | (_| |\ V  V / (_| | |_| |
-        |_| |___/\__, |\__,_|\__,_|_|  \___|\__,_|\__,_| \_/\_/ \__,_|\__, |
-                    |_|                                               |___/
-        ''',
-        mimetype='text/plain'
-    )
+    return render_template('index.html')
 
 
 def render_venue_list(venues, format):
