@@ -5,7 +5,7 @@ import json
 class Venue(object):
     def __init__(self, venue):
         self.name = venue['name']
-        self.categories = [x['name'] for x in venue['categories']]
+        self.url = venue['canonicalUrl']
         self.checkins = venue['stats']['checkinsCount']
         self.users = venue['stats']['usersCount']
         self.tips = venue['stats']['tipCount']
@@ -15,16 +15,27 @@ class Venue(object):
         self.address = venue['location'].get('address', '')
         self.id = venue['id']
 
-    @property
-    def relevance(self):
-        if self.users:
-            return self.checkins / self.users
-        else:
-            return 9999
+        _, icon, categories = self._get_categories(venue)
+        self.icon = icon['prefix'] + 'bg_32' + icon['suffix']
+        self.categories = ', '.join(categories)
+
+        self.relevance = 0
+
+    def _get_categories(self, venue):
+        primary = None
+        icon = None
+        categories = []
+        for cat in venue['categories']:
+            if 'primary' in cat and cat['primary']:
+                primary = cat['name']
+                icon = cat['icon']
+            else:
+                categories.append(cat['name'])
+        return primary, icon, [primary] + categories
 
     def __iter__(self):
         yield self.name
-        yield ';'.join(self.categories)
+        yield self.categories
         yield self.checkins
         yield self.users
         yield self.tips

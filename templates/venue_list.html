@@ -17,11 +17,15 @@
 		width: 32px;
 		height: 32px;
 	}
+	.irrelevant td {
+		background: #ddd;
+	}
 </style>
 <table>
 	<tr>
 		<th></th>
 		<th>Name</th>
+		<th>Relevance</th>
 		<th>Checkins</th>
 		<th>Users</th>
 		<th>Tips</th>
@@ -30,19 +34,18 @@
 		<th>Location</th>
 	</tr>
 	{% for venue in venues %}
-	<tr>
+	<tr{% if venue.relevance >= THRESHOLD %} class="irrelevant"{% endif %}>
 		<td>
-			{% for cat in venue['categories'] %}
-			<img src="{{ cat['icon']['prefix'] }}bg_32{{ cat['icon']['suffix'] }}" title="{{ cat['name'] }}">
-			{% endfor %}
+			<img src="{{ venue.icon }}" title="{{ venue.categories }}">
 		</td>
-		<td><a href="{{ venue['canonicalUrl'] }}">{{ venue['name'] }}</td>
-		<td>{{ venue['stats']['checkinsCount'] }}</td>
-		<td>{{ venue['stats']['usersCount'] }}</td>
-		<td>{{ venue['stats']['tipCount'] }}</td>
-		<td>{{ venue['likes']['count'] }}</td>
-		<td>{{ venue['specials']['count'] }}</td>
-		<td>{{ venue['location']['city'] }} {{ venue['location']['address'] }}</td>
+		<td><a href="{{ venue.url }}">{{ venue.name }}</td>
+		<td><b>{{ venue.relevance }}</b></td>
+		<td>{{ venue.checkins }}</td>
+		<td>{{ venue.users }}</td>
+		<td>{{ venue.tips }}</td>
+		<td>{{ venue.likes }}</td>
+		<td>{{ venue.specials }}</td>
+		<td>{{ venue.city }} {{ venue.address }}</td>
 	</tr>
 	{% endfor %}
 <table>

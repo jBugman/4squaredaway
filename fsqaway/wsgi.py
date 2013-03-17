@@ -13,9 +13,12 @@ from flask.ext.basicauth import BasicAuth
 from fsqaway.log import get_logger
 from fsqaway.models import Venue, Category
 from fsqaway.foursquare_api import FoursquareAPI
+from fsqaway.magic import Magic, THRESHOLD
 
 
 ITERATIONS = 10
+
+logger = get_logger(__name__)
 
 app = Flask(
     '4squaredaway',
@@ -25,8 +28,9 @@ app = Flask(
 app.logger.handlers = []
 app.config.from_object('fsqaway.config')
 basic_auth = BasicAuth(app)
+
 api = FoursquareAPI()
-logger = get_logger(__name__)
+magic = Magic()
 
 
 @app.route('/favicon.ico')
@@ -59,17 +63,6 @@ def render_venue_list(venues, format):
             mimetype='application/json'
         )
 
-    if format == 'html':
-        def venue_comparator(venue):
-            if 'categories' in venue and venue['categories']:
-                return venue['categories'][0]['name']
-            else:
-                return ''
-        return render_template(
-            'venue_list.html',
-            venues=sorted(venues, key=venue_comparator)
-        )
-
     if format == 'csv':
         def generate_csv(data):
             for row in data:
@@ -78,6 +71,20 @@ def render_venue_list(venues, format):
         return Response(generate_csv(
             list(Venue(venue)) for venue in venues
         ), mimetype='text/plain')
+
+    abort(400, u'Поддерживаются только CSV и JSON')
+
+
+@app.route('/magic')
+@basic_auth.required
+def venue_magic():
+    logger.debug('/magic')
+    result = magic.get_venues_magically()
+    return render_template(
+        'venue_list.html',
+        venues=result,
+        THRESHOLD=THRESHOLD
+    )
 
 
 @app.route('/search/<name>')
