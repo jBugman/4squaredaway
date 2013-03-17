@@ -4,6 +4,7 @@ HTTP_PORT = 8087
 DEBUG = False
 
 CACHE_TYPE = 'redis'
+CACHE_DATABASE = 1
 
 SENTRY_DSN = ''
 USE_SENTRY = False

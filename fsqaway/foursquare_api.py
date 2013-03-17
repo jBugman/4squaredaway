@@ -11,6 +11,7 @@ from fsqaway.config import (
     GEVENT_POOL_SIZE,
 )
 from fsqaway.models import Category
+from fsqaway.cache import Cache
 
 
 SEARCH_INTENT = 'browse'
@@ -20,25 +21,21 @@ COORDS_RADIUS = 0.25
 
 
 class FoursquareAPI(object):
-    def __init__(self, cache):
+    def __init__(self):
         self.logger = get_logger(__name__)
         self.fsq = Foursquare(
             client_id=FOURSQUARE_CLIENT_ID,
             client_secret=FOURSQUARE_CLIENT_SECRET
         )
-        self.cache = cache
+        self.cache = Cache()
 
     def batch_search(self, search_term, iterations, filter):
+        """ @deprecated """
         pool = Pool(GEVENT_POOL_SIZE)
-        categories_filter = ','.join(
-            (x['id'] for x in Category.filter(
-                Category.cleanup(self.get_categories())
-            ))
-        )
         result = pool.map(
             lambda x: self.search(
                 search_term,
-                categories_filter
+                self.categories_filter
             ).get('venues', []),
             range(iterations)
         )
@@ -62,12 +59,21 @@ class FoursquareAPI(object):
             params['categoryId'] = filter
         return self.fsq.venues.search(params=params)
 
+    @property
+    def categories_filter(self):
+        KEY = '.'.join((__name__, self.__class__.__name__, 'categories_filter'))
+        if self.cache.exists(KEY):
+            return self.cache.get(KEY)
+
+        result = ','.join(
+            (x['id'] for x in Category.filter(self.get_categories()))
+        )
+        self.cache.put(KEY, result, CATEGORIES_LIST_CACHE_TIMEOUT)
+        return result
+
     def get_categories(self):
-        @self.cache.cached(timeout=CATEGORIES_LIST_CACHE_TIMEOUT)
-        def _cached():
-            self.logger.debug('API call \'Categories\'')
-            return self.fsq.venues.categories()['categories']
-        return _cached()
+        self.logger.debug('API call \'Categories\'')
+        return Category.cleanup(self.fsq.venues.categories()['categories'])
 
     def get_random_coords(self, center=COORDS_CENTER, radius=COORDS_RADIUS):
         while True:

@@ -9,7 +9,6 @@ from flask import (
     abort, render_template, request, redirect, url_for
 )
 from flask.ext.basicauth import BasicAuth
-from flask.ext.cache import Cache
 
 from fsqaway.log import get_logger
 from fsqaway.models import Venue, Category
@@ -26,7 +25,7 @@ app = Flask(
 app.logger.handlers = []
 app.config.from_object('fsqaway.config')
 basic_auth = BasicAuth(app)
-cache = Cache(app, with_jinja2_ext=False)
+api = FoursquareAPI()
 logger = get_logger(__name__)
 
 
@@ -87,7 +86,7 @@ def venue_search(name):
     format = request.args.get('format', 'html')
     iterations = int(request.args.get('iterations', ITERATIONS))
     logger.debug('Search \'%s\' format=%s n=%d' % (name, format, iterations))
-    result = FoursquareAPI(cache).batch_search(name, iterations, filter=False)
+    result = api.batch_search(name, iterations, filter=False)
     return render_venue_list(result, format)
 
 
@@ -97,7 +96,7 @@ def venue_filter(name):
     format = request.args.get('format', 'html')
     iterations = int(request.args.get('iterations', ITERATIONS))
     logger.debug('Filter \'%s\' format=%s n=%d' % (name, format, iterations))
-    result = FoursquareAPI(cache).batch_search(name, iterations, filter=True)
+    result = api.batch_search(name, iterations, filter=True)
     return render_venue_list(result, format)
 
 
@@ -105,8 +104,7 @@ def venue_filter(name):
 @basic_auth.required
 def categories_tree():
     filtered = request.args.get('filter', False)
-    categories = FoursquareAPI(cache).get_categories()
-    result = Category.cleanup(categories)
+    result = api.get_categories()
 
     if filtered:
         result = Category.filter(result)
