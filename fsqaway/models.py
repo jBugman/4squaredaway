@@ -15,8 +15,11 @@ class Venue(object):
         self.address = venue['location'].get('address', '')
         self.id = venue['id']
 
+        photos = venue.get('photos', None)
+        self.photos = photos.get('count', 0) if photos else 0
+
         _, icon, categories = self._get_categories(venue)
-        self.icon = icon['prefix'] + 'bg_32' + icon['suffix']
+        self.icon = (icon['prefix'], icon['suffix'])
         self.categories = ', '.join(categories)
 
         self.relevance = 0
@@ -34,6 +37,7 @@ class Venue(object):
         return primary, icon, [primary] + categories
 
     def __iter__(self):
+        # Поля, например, для CSV
         yield self.name
         yield self.categories
         yield self.checkins

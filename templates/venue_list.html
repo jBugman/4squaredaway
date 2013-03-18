@@ -36,7 +36,7 @@
 	{% for venue in venues %}
 	<tr{% if venue.relevance > THRESHOLD %} class="irrelevant"{% endif %}>
 		<td>
-			<img src="{{ venue.icon }}" title="{{ venue.categories }}">
+			<img src="{{ venue.icon[0] + 'bg_32' + venue.icon[1] }}" title="{{ venue.categories }}">
 		</td>
 		<td><a href="{{ venue.url }}">{{ venue.name }}</td>
 		<td><b>{{ venue.relevance }}</b></td>

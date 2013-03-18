@@ -2,7 +2,7 @@
 {% block content %}
 <div class="row">
 	<div class="span4">
-		<a href="#/magic" class="btn btn-large btn-success" type="button">
+		<a href="/magic" class="btn btn-large btn-success" type="button">
 			<i class="icon-star icon-white"></i>
 			Найти как <span class="nowrap">по-волшебству!</span>
 		</a>
@@ -16,29 +16,31 @@
 </div>
 <div class="row search-results-container">
 	<div class="span12">
-		<h2>Найдено по-волшебству <small class="search-results-count">5 объектов</small></h2>
+		<h2>Найдено по-волшебству <small class="search-results-count">{{ venues|length }} объектов</small></h2>
 		<div class="row search-results">
 			<div class="span9">
-				<table class="search-result irrelevant">
+				{% for venue in venues %}
+				{% set relevant = venue.relevance <= THRESHOLD %}
+				<table class="search-result{% if not relevant %} irrelevant{% endif %}">
 					<tr>
 						<td class="search-result-icon-container">
-							<img class="search-result-icon" src="https://foursquare.com/img/categories_v2/shops/gas_bg_44.png" alt="Housing development" title="Housing development">
+							<img class="search-result-icon" src="{{ venue.icon[0] + 'bg_44' + venue.icon[1] }}" alt="{{ venue.categories }}" title="{{ venue.categories }}">
 						</td>
 						<td>
-							<a href="https://foursquare.com/v/%D0%BF%D1%80%D0%BE%D0%B4%D1%83%D0%BA%D1%82%D1%8B--%D0%BB%D0%B0%D1%80%D0%B5%D0%BA-%D0%B2-%D0%B0%D1%80%D0%BA%D0%B0%D0%B4%D0%B0%D1%85%D0%B0%D1%83%D1%81%D0%B5/5068528ee4b08b705a5fe5dc"><h3 class="search-result-header">Хаус Авто Доктор</h3></a>
-							<p>Gas Station / Garage</p>
-							<span class="label search-result-label">96 (26)</span>
+							<a href="{{ venue.url }}"><h3 class="search-result-header">{{ venue.name }}</h3></a>
+							<p>{{ venue.categories }}</p>
+							<span class="label search-result-label">{{ venue.checkins }} ({{ venue.users }})</span>
 							<span class="search-result-stats muted">
-								2 tips, 0 likes, 0 photos
+								{{ venue.tips }} tips, {{ venue.likes }} likes, {{ venue.photos }} photos
 							</span>
 						</td>
 						<td>
 							<div class="btn-group pull-right search-result-controls" data-toggle="buttons-radio">
-								<button type="button" class="btn btn-large">
+								<button title="{{ venue.relevance }}" type="button" class="btn btn-large{% if relevant %} active{% endif %}">
 									<i class="icon-home"></i>
 									это дом
 								</button>
-								<button type="button" class="btn btn-large active">
+								<button type="button" class="btn btn-large{% if not relevant %} active{% endif %}">
 									<i class="icon-ok"></i>
 									все ОК
 								</button>
@@ -46,114 +48,7 @@
 						</td>
 					</tr>
 				</table>
-				<table class="search-result irrelevant">
-					<tr>
-						<td class="search-result-icon-container">
-							<img class="search-result-icon" src="https://foursquare.com/img/categories_v2/travel/hotel_bg_44.png" alt="Housing development" title="Housing development">
-						</td>
-						<td>
-							<a href="https://foursquare.com/v/%D0%BF%D1%80%D0%BE%D0%B4%D1%83%D0%BA%D1%82%D1%8B--%D0%BB%D0%B0%D1%80%D0%B5%D0%BA-%D0%B2-%D0%B0%D1%80%D0%BA%D0%B0%D0%B4%D0%B0%D1%85%D0%B0%D1%83%D1%81%D0%B5/5068528ee4b08b705a5fe5dc"><h3 class="search-result-header">Дом Отдыха "Суханово"</h3></a>
-							<p>Hotel</p>
-							<span class="label search-result-label">48 (7)</span>
-							<span class="search-result-stats muted">
-								1 tips, 0 likes, 0 photos
-							</span>
-						</td>
-						<td>
-							<div class="btn-group pull-right search-result-controls" data-toggle="buttons-radio">
-								<button type="button" class="btn btn-large">
-									<i class="icon-home"></i>
-									это дом
-								</button>
-								<button type="button" class="btn btn-large active">
-									<i class="icon-ok"></i>
-									все ОК
-								</button>
-							</div>
-						</td>
-					</tr>
-				</table>
-				<table class="search-result">
-					<tr>
-						<td class="search-result-icon-container">
-							<img class="search-result-icon" src="https://foursquare.com/img/categories_v2/building/housingdevelopment_bg_44.png" alt="Housing development" title="Housing development">
-						</td>
-						<td>
-							<a href="#"><h3 class="search-result-header">Квартира Комаровых</h3></a>
-							<p>Residential Building (Apartment / Condo)</p>
-							<span class="label search-result-label">24 (14)</span>
-							<span class="search-result-stats muted">
-								0 tips, 0 likes, 0 photos
-							</span>
-						</td>
-						<td>
-							<div class="btn-group pull-right search-result-controls" data-toggle="buttons-radio">
-								<button type="button" class="btn btn-large active">
-									<i class="icon-home"></i>
-									это дом
-								</button>
-								<button type="button" class="btn btn-large">
-									<i class="icon-ok"></i>
-									все ОК
-								</button>
-							</div>
-						</td>
-					</tr>
-				</table>
-				<table class="search-result">
-					<tr>
-						<td class="search-result-icon-container">
-							<img class="search-result-icon" src="https://foursquare.com/img/categories_v2/building/default_bg_44.png" alt="Building" title="Housing development">
-						</td>
-						<td>
-							<a href="#"><h3 class="search-result-header">КвартираЛыковой-Шипиловская,44</h3></a>
-							<p>Building</p>
-							<span class="label search-result-label">1 (1)</span>
-							<span class="search-result-stats muted">
-								0 tips, 0 likes, 0 photos
-							</span>
-						</td>
-						<td>
-							<div class="btn-group pull-right search-result-controls" data-toggle="buttons-radio">
-								<button type="button" class="btn btn-large active">
-									<i class="icon-home"></i>
-									это дом
-								</button>
-								<button type="button" class="btn btn-large">
-									<i class="icon-ok"></i>
-									все ОК
-								</button>
-							</div>
-						</td>
-					</tr>
-				</table>
-				<table class="search-result">
-					<tr>
-						<td class="search-result-icon-container">
-							<img class="search-result-icon" src="https://foursquare.com/img/categories_v2/building/housingdevelopment_bg_44.png" alt="Housing development" title="Housing development">
-						</td>
-						<td>
-							<a href="#"><h3 class="search-result-header">Чисто У Маратика На Хате</h3></a>
-							<p>Residential Building (Apartment / Condo)</p>
-							<span class="label search-result-label">5 (2)</span>
-							<span class="search-result-stats muted">
-								4 tips, 0 likes, 0 photos
-							</span>
-						</td>
-						<td>
-							<div class="btn-group pull-right search-result-controls" data-toggle="buttons-radio">
-								<button type="button" class="btn btn-large active">
-									<i class="icon-home"></i>
-									это дом
-								</button>
-								<button type="button" class="btn btn-large">
-									<i class="icon-ok"></i>
-									все ОК
-								</button>
-							</div>
-						</td>
-					</tr>
-				</table>
+				{% endfor %}
 			</div>
 			<div class="span3 infobox muted">
 				Тут место для всякой метадаты запроса, информации об истраченных лимитах и прочего.
@@ -164,7 +59,7 @@
 <div class="row">
 	<div class="span9">
 		<a href="#/go!" class="btn btn-large btn-info pull-right button-results-submit" type="button">
-			Отправить 3 мест на проверку
+			Отправить {{ relevant_count }} мест на проверку
 		</a>
 	</div>
 </div>

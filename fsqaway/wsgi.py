@@ -51,7 +51,7 @@ def index():
 
 @app.route('/bootstrap/')
 def bootstrap():
-    return render_template('magic.html')
+    return render_template('test.html')
 
 
 def render_venue_list(venues, format):
@@ -79,9 +79,10 @@ def venue_magic():
     logger.debug('/magic')
     result = magic.get_venues_magically()
     return render_template(
-        'venue_list.html',
+        'magic.html',
         venues=result,
-        THRESHOLD=THRESHOLD
+        THRESHOLD=THRESHOLD,
+        relevant_count=len([x for x in result if x.relevance <= THRESHOLD])
     )
 
 
