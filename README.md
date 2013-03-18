@@ -59,3 +59,5 @@
     sudo ln -fs /home/ubuntu/4squaredaway/deploy/4sq.conf /etc/supervisor/conf.d/4sq.conf
     sudo supervisorctl reread
     sudo supervisorctl update
+
+Flask-Assets (Stylus) requires `npm install stylus` (nodejs package)
