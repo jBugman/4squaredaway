@@ -2,3 +2,5 @@
 local_config.py
 .DS_Store
 ~*
+*.pyc
+static/.webassets-cache/

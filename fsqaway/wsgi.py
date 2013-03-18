@@ -9,6 +9,7 @@ from flask import (
     abort, render_template, request, redirect, url_for
 )
 from flask.ext.basicauth import BasicAuth
+from flask.ext.assets import Environment, Bundle
 
 from fsqaway.log import get_logger
 from fsqaway.models import Venue, Category
@@ -28,6 +29,8 @@ app = Flask(
 app.logger.handlers = []
 app.config.from_object('fsqaway.config')
 basic_auth = BasicAuth(app)
+
+assets = Environment(app)
 
 api = FoursquareAPI()
 magic = Magic()

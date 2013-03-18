@@ -2,6 +2,7 @@
 HTTP_PORT = 8087
 
 DEBUG = False
+ASSETS_DEBUG = False
 
 CACHE_TYPE = 'redis'
 CACHE_DATABASE = 1
