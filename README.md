@@ -60,4 +60,4 @@
     sudo supervisorctl reread
     sudo supervisorctl update
 
-Flask-Assets (Stylus) requires `npm install stylus` (nodejs package)
+Flask-Assets (Stylus) requires `sudo npm install -g stylus` (nodejs package)

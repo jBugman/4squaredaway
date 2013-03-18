@@ -4,3 +4,4 @@ local_config.py
 ~*
 *.pyc
 static/.webassets-cache/
+static/css/styles.min.css
