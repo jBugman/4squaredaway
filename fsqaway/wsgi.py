@@ -36,20 +36,22 @@ api = FoursquareAPI()
 magic = Magic()
 
 
-@app.route('/favicon.ico')
-def favicon():
-    return redirect(url_for(
-        'static',
-        filename='img/poweredByFoursquare_16x16.png'
-    ))
+# @app.route('/favicon.ico')
+# def favicon():
+#     return redirect(url_for(
+#         'static',
+#         filename='img/poweredByFoursquare_16x16.png'
+#     ))
 
 
 @app.route('/')
+@basic_auth.required
 def index():
     return render_template('index.html')
 
 
 @app.route('/bootstrap')
+@basic_auth.required
 def bootstrap():
     return render_template('test.html', venues=range(50))
 
