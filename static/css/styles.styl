@@ -3,6 +3,10 @@ border_radius(radius)
     -moz-border-radius radius
     border-radius radius
 
+opacity(n)
+    opacity n
+    filter unquote('progid:DXImageTransform.Microsoft.Alpha(Opacity=' + round(n * 100) + ')')
+
 .nowrap {
     white-space: nowrap;
 }
@@ -25,8 +29,11 @@ border_radius(radius)
     background: url('/static/img/poweredByFoursquare_16x16.png') 0 50% no-repeat;
 }
 
-.form__height_large
-    margin 7px 0 0 0
+.form-search
+    margin 7px 0 0 40px
+
+    .search-query
+        margin-right 1em
 
 .search-results-container
     margin-top 35px
@@ -39,50 +46,62 @@ border_radius(radius)
 
 SEARCH_RESULT_PADDING = 15px
 SEARCH_RESULT_ICON_SIZE = 44px
+SEARCH_RESULT_HEIGHT = 120px
 .search-result
-    background-color #E1F1FA
+    background-color #d9edf7
+    border-color #bce8f1
     border_radius(4px)
     width 100%
     margin-bottom 10px
+    box-sizing border-box
+    padding SEARCH_RESULT_PADDING
+    height SEARCH_RESULT_HEIGHT
 
-.search-result td
-    padding 0
-    margin 0
+    &.irrelevant
+        background-color #fcf8e3
+        border 1px solid #fbeed5
 
-.search-result-icon-container
-    width SEARCH_RESULT_ICON_SIZE + 2 * SEARCH_RESULT_PADDING
-    vertical-align top
+    p
+        margin 0
+        line-height 140%
+
+.search-result-content
+    position relative
+    padding 0 0 0 SEARCH_RESULT_ICON_SIZE + SEARCH_RESULT_PADDING
+    height SEARCH_RESULT_HEIGHT - 2 * SEARCH_RESULT_PADDING - 2 * 1px
 
 .search-result-icon
-    margin SEARCH_RESULT_PADDING
     width SEARCH_RESULT_ICON_SIZE
     height SEARCH_RESULT_ICON_SIZE
-
-.search-result-header {
-    margin: 5px 0 0;
-    font-size: 16pt;
-}
-.search-result-label
-    background: #999999 url('https://playfoursquare.s3.amazonaws.com/press/logo/icon-16x16.png') 5px 4px no-repeat
-    padding 0 5px 0 26px
-    line-height 24px
-    display inline-block
-    margin-bottom SEARCH_RESULT_PADDING
-
-.search-result-stats {
-    margin-left: 10px;
-    line-height: 24px;
-    font-size: 12pt;
-    position: relative;
-    bottom: -1px;
-}
+    position absolute
+    top 0
+    left 0
 
 .search-result-controls
-    margin-right SEARCH_RESULT_PADDING
+    position absolute
+    top 50%
+    right 0
+    margin-top -23px  // Половина высоты кнопок (45/2)
 
-.search-result.irrelevant {
-    background-color: #FCF9E8;
-}
+.search-result-header
+    margin 0 0 3px 0
+    font-size 15pt
+
+.search-result-stats
+    font-size 12pt
+    position absolute
+    bottom 0
+
+    .muted [class^="icon-"]
+        opacity(0.35)
+
+    span
+        margin-right 0.5em
+
+.search-result-stats__checkins
+    background: url('https://playfoursquare.s3.amazonaws.com/press/logo/icon-16x16.png') 0 2px no-repeat
+    padding 0 0 0 22px
+    display inline-block
 
 .search-result.irrelevant + .search-result:not(.irrelevant) {
     margin-top: 24px;
@@ -98,7 +117,7 @@ SEARCH_RESULT_ICON_SIZE = 44px
     box-sizing border-box
     font-size 15px
 
-.footer__foursquare-powerded {
+.footer__foursquare-powered {
     height: 80px;
     position: relative;
     right: -30px;
