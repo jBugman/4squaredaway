@@ -45,11 +45,13 @@ def favicon():
 
 
 @app.route('/')
+@basic_auth.required
 def index():
     return render_template('index.html')
 
 
 @app.route('/bootstrap')
+@basic_auth.required
 def bootstrap():
     return render_template('test.html', venues=range(50))
 
