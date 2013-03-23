@@ -51,7 +51,7 @@
 							</span>
 						</div>
 						<div class="btn-group search-result-controls" data-toggle="buttons-radio">
-							<button title="{{ venue.relevance }}" type="button" class="btn btn-large{% if relevant %} active{% endif %}">
+							<button title="{{ venue.relevance }}" type="button" class="4sq-checked btn btn-large{% if relevant %} active{% endif %}">
 								<i class="icon-home"></i>
 								это дом
 							</button>
@@ -73,11 +73,24 @@
 <div class="row">
 	<div class="span9">
 		<a href="#/go!" class="btn btn-large btn-info pull-right button-results-submit" type="button">
-			Отправить {{ venues|length - 3 }} мест на проверку
+			Отправить <span id="4sq-send-title">{{ venues|length - 3 }} мест</span> на проверку
 		</a>
 	</div>
 </div>
 <footer class="row footer">
 	<img class="pull-right footer__foursquare-powered" src="https://playfoursquare.s3.amazonaws.com/press/logo/poweredByFoursquare_gray.png">
 </footer>
+{% endblock %}
+{% block scripts %}
+<script>
+$(document).ready(function(){
+	var declension = function(number, titles) {
+		return titles[(number % 100 > 4 && number % 100 < 20) ? 2 : [2, 0, 1, 1, 1, 2][(number % 10 < 5) ? number % 10 : 5]];
+	}
+	$(".search-result-controls .btn").on("click", function(event) {
+		var number = $(".4sq-checked.active").size();
+		$("#4sq-send-title").text(number + ' ' + declension(number, ['место', 'места', 'мест']));
+	});
+});
+</script>
 {% endblock %}
