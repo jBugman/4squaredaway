@@ -25,20 +25,28 @@
 					<div class="search-result-content">
 						<img class="search-result-icon" src="https://foursquare.com/img/categories_v2/shops/gas_bg_44.png" alt="Housing development" title="Housing development">
 						<h4 class="search-result-header"><a href="https://foursquare.com/">Хаус Авто Доктор</a></h4>
-						<p>Gas Station / Garage</p>
-						{% if loop.index0 % 2 %}<p class="muted">Комсомольская пл., 3</p>{% endif %}
+						<div class="search-result-description">
+							<span>Gas Station / Garage / Gas Station / Garage</span>
+							{% if loop.index0 % 2 %}<span class="search-result-address muted">Комсомольская пл., 3</span>{% endif %}
+						</div>
 						<div class="search-result-stats">
-							<span class="search-result-stats__checkins">96 (26)</span>
-							<span class="">
-								<i class="icon-comment"></i>
+							<span class="search-result-stats__checkins">
+								96
+							</span>
+							<span>
+								<i class="icon-user icon"></i>
+								26
+							</span>
+							<span>
+								<i class="icon-comment icon"></i>
 								2
 							</span>
 							<span class="muted">
-								<i class="icon-heart"></i>
+								<i class="icon-heart icon"></i>
 								0
 							</span>
 							<span class="muted">
-								<i class="icon-camera"></i>
+								<i class="icon-camera icon"></i>
 								0
 							</span>
 						</div>

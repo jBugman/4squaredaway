@@ -7,9 +7,8 @@ opacity(n)
     opacity n
     filter unquote('progid:DXImageTransform.Microsoft.Alpha(Opacity=' + round(n * 100) + ')')
 
-.nowrap {
-    white-space: nowrap;
-}
+.nowrap
+    white-space nowrap
 
 .brand.fsq-brand {
     color: #fff;
@@ -55,7 +54,6 @@ SEARCH_RESULT_HEIGHT = 120px
     margin-bottom 10px
     box-sizing border-box
     padding SEARCH_RESULT_PADDING
-    height SEARCH_RESULT_HEIGHT
 
     &.irrelevant
         background-color #fcf8e3
@@ -68,7 +66,26 @@ SEARCH_RESULT_HEIGHT = 120px
 .search-result-content
     position relative
     padding 0 0 0 SEARCH_RESULT_ICON_SIZE + SEARCH_RESULT_PADDING
-    height SEARCH_RESULT_HEIGHT - 2 * SEARCH_RESULT_PADDING - 2 * 1px
+    width 100%
+    box-sizing border-box
+
+.search-result-controls
+    position static
+    margin-top SEARCH_RESULT_PADDING
+    display block
+    width 100%
+
+@media (min-width: 979px)
+    .search-result-content
+        padding-right 250px  // Ширина кнопок + отступ
+
+    .search-result-controls
+        position absolute
+        top 50%
+        right 0
+        margin-top -22px  // Половина высоты кнопок (45/2)
+        display inline-block
+        width auto
 
 .search-result-icon
     width SEARCH_RESULT_ICON_SIZE
@@ -77,26 +94,32 @@ SEARCH_RESULT_HEIGHT = 120px
     top 0
     left 0
 
-.search-result-controls
-    position absolute
-    top 50%
-    right 0
-    margin-top -23px  // Половина высоты кнопок (45/2)
-
 .search-result-header
-    margin 0 0 3px 0
+    margin 0 0 4px 0
     font-size 15pt
+
+.search-result-description
+    overflow hidden
+    white-space nowrap
+    text-overflow ellipsis
+
+.search-result-address
+    margin-left 0.75em
 
 .search-result-stats
     font-size 12pt
-    position absolute
-    bottom 0
+    margin-top 0.5em
 
-    .muted [class^="icon-"]
+    .icon
+        opacity(0.75)
+        position relative
+        top 1px
+
+    .muted .icon
         opacity(0.35)
 
     span
-        margin-right 0.5em
+        margin-right 0.7em
 
 .search-result-stats__checkins
     background: url('https://playfoursquare.s3.amazonaws.com/press/logo/icon-16x16.png') 0 2px no-repeat
