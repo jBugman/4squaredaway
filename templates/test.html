@@ -73,7 +73,7 @@
 <div class="row">
 	<div class="span9">
 		<a href="#/go!" class="btn btn-large btn-info pull-right button-results-submit" type="button">
-			Отправить <span id="4sq-send-title">{{ venues|length - 3 }} мест</span> на проверку
+			Отправить <span id="4sq-send-title">{{ venues|length - 4 }} мест</span> на проверку
 		</a>
 	</div>
 </div>
@@ -88,8 +88,10 @@ $(document).ready(function(){
 		return titles[(number % 100 > 4 && number % 100 < 20) ? 2 : [2, 0, 1, 1, 1, 2][(number % 10 < 5) ? number % 10 : 5]];
 	}
 	$(".search-result-controls .btn").on("click", function(event) {
-		var number = $(".4sq-checked.active").size();
-		$("#4sq-send-title").text(number + ' ' + declension(number, ['место', 'места', 'мест']));
+		setTimeout(function() {
+			var number = $(".4sq-checked.active").size();
+			$("#4sq-send-title").text(number + ' ' + declension(number, ['место', 'места', 'мест']));
+		}, 100);
 	});
 });
 </script>
