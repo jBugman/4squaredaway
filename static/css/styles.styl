@@ -87,6 +87,28 @@ SEARCH_RESULT_HEIGHT = 120px
         display inline-block
         width auto
 
+@media (max-width: 480px)
+    .search-result-controls
+        margin-left -(SEARCH_RESULT_ICON_SIZE + SEARCH_RESULT_PADDING)
+
+    .form-search
+        margin 10px 0 0 0
+
+        .search-query
+            width 100%
+            display block
+            box-sizing border-box
+            height 2em
+
+            +.btn
+                display block
+                margin-top 10px
+
+    .footer .footer__foursquare-powered
+        display block
+        margin 0 auto
+        position static
+
 .search-result-icon
     width SEARCH_RESULT_ICON_SIZE
     height SEARCH_RESULT_ICON_SIZE
