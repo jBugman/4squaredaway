@@ -7,6 +7,13 @@ opacity(n)
     opacity n
     filter unquote('progid:DXImageTransform.Microsoft.Alpha(Opacity=' + round(n * 100) + ')')
 
+transform-scale(n)
+    transform scale(n)
+    -ms-transform scale(n)
+    -webkit-transform scale(n)
+    -o-transform scale(n)
+    -moz-transform scale(n)
+
 .nowrap
     white-space nowrap
 
@@ -87,6 +94,28 @@ SEARCH_RESULT_HEIGHT = 120px
         display inline-block
         width auto
 
+.search-result-stats
+    font-size 12pt
+    margin-top 0.5em
+
+    .icon
+        opacity(0.75)
+        position relative
+        top 2px
+        margin 0 3px 0 0
+
+    .muted .icon
+        opacity(0.35)
+
+    span
+        margin-right 0.7em
+        white-space nowrap
+
+.search-result-stats__checkins
+    background: url('https://playfoursquare.s3.amazonaws.com/press/logo/icon-16x16.png') 0 2px no-repeat
+    padding 0 0 0 22px
+    display inline-block
+
 @media (max-width: 480px)
     .search-result-controls
         margin-left -(SEARCH_RESULT_ICON_SIZE + SEARCH_RESULT_PADDING)
@@ -127,26 +156,6 @@ SEARCH_RESULT_HEIGHT = 120px
 
 .search-result-address
     margin-left 0.75em
-
-.search-result-stats
-    font-size 12pt
-    margin-top 0.5em
-
-    .icon
-        opacity(0.75)
-        position relative
-        top 1px
-
-    .muted .icon
-        opacity(0.35)
-
-    span
-        margin-right 0.7em
-
-.search-result-stats__checkins
-    background: url('https://playfoursquare.s3.amazonaws.com/press/logo/icon-16x16.png') 0 2px no-repeat
-    padding 0 0 0 22px
-    display inline-block
 
 .search-result.irrelevant + .search-result:not(.irrelevant) {
     margin-top: 24px;
