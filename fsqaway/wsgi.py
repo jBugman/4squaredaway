@@ -36,14 +36,6 @@ api = FoursquareAPI()
 magic = Magic()
 
 
-# @app.route('/favicon.ico')
-# def favicon():
-#     return redirect(url_for(
-#         'static',
-#         filename='img/poweredByFoursquare_16x16.png'
-#     ))
-
-
 @app.route('/')
 @basic_auth.required
 def index():
@@ -53,7 +45,43 @@ def index():
 @app.route('/bootstrap')
 @basic_auth.required
 def bootstrap():
-    return render_template('test.html', venues=range(50))
+    _MOCK_TOTAL_COUNT = 15
+    _MOCK_RELEVANT_COUNT = 3
+
+    def _mocked_venues():
+        return [{
+            'relevance': 15 if x < _MOCK_RELEVANT_COUNT else 0,
+            'icon': ['https://foursquare.com/img/categories_v2/shops/gas_', '.png'],
+            'categories': 'Gas Station / Garage',
+            'url': 'https://foursquare.com/',
+            'name': u'Хаус Авто Доктор',
+            'address': u'Комсомольская пл., 3',
+            'checkins': 96,
+            'users': 26,
+            'tips': 2,
+            'likes': 0,
+            'photos': 0,
+        } for x in range(_MOCK_TOTAL_COUNT)]
+
+    return render_template(
+        'magic.html',
+        venues=_mocked_venues(),
+        THRESHOLD=THRESHOLD,
+        relevant_count=_MOCK_TOTAL_COUNT - _MOCK_RELEVANT_COUNT
+    )
+
+
+@app.route('/magic')
+@basic_auth.required
+def venue_magic():
+    logger.debug('/magic')
+    result = magic.get_venues_magically()
+    return render_template(
+        'magic.html',
+        venues=result,
+        THRESHOLD=THRESHOLD,
+        relevant_count=len([x for x in result if x.relevance <= THRESHOLD])
+    )
 
 
 def render_venue_list(venues, format):
@@ -73,19 +101,6 @@ def render_venue_list(venues, format):
         ), mimetype='text/plain')
 
     abort(400, u'Поддерживаются только CSV и JSON')
-
-
-@app.route('/magic')
-@basic_auth.required
-def venue_magic():
-    logger.debug('/magic')
-    result = magic.get_venues_magically()
-    return render_template(
-        'magic.html',
-        venues=result,
-        THRESHOLD=THRESHOLD,
-        relevant_count=len([x for x in result if x.relevance <= THRESHOLD])
-    )
 
 
 @app.route('/search/<name>')

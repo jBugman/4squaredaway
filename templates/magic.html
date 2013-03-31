@@ -1,14 +1,14 @@
 {% extends "bootstrap.html" %}
 {% block content %}
 <div class="row">
-	<div class="span4">
+	<div class="span">
 		<a href="{{ url_for('venue_magic') }}" class="btn btn-large btn-success" type="button">
 			<i class="icon-star icon-white"></i>
 			Найти как <span class="nowrap">по-волшебству!</span>
 		</a>
 	</div>
-	<div class="span8">
-		<form class="form-search">
+	<div class="span">
+		<form class="form-search form__height_large">
 			<input type="text" class="input-medium search-query">
 			<a href="#/search" type="submit" class="btn">Найти по запросу</a>
 		</form>
@@ -16,38 +16,38 @@
 </div>
 <div class="row search-results-container">
 	<div class="span12">
-		<h2>Найдено по-волшебству <small class="search-results-count">{{ venues|length }} объектов</small></h2>
+		<h3>Найдено по-волшебству <small class="search-results-count nowrap">{{ venues|length }} объектов</small></h3>
 		<div class="row search-results">
 			<div class="span9">
 				{% for venue in venues %}
 				{% set relevant = venue.relevance <= THRESHOLD %}
-				<table class="search-result{% if not relevant %} irrelevant{% endif %}">
-					<tr>
-						<td class="search-result-icon-container">
-							<img class="search-result-icon" src="{{ venue.icon[0] + 'bg_44' + venue.icon[1] }}" alt="{{ venue.categories }}" title="{{ venue.categories }}">
-						</td>
-						<td>
-							<a href="{{ venue.url }}"><h3 class="search-result-header">{{ venue.name }}</h3></a>
-							<p>{{ venue.categories }}</p>
-							<span class="label search-result-label">{{ venue.checkins }} ({{ venue.users }})</span>
-							<span class="search-result-stats muted">
-								{{ venue.tips }} tips, {{ venue.likes }} likes, {{ venue.photos }} photos
-							</span>
-						</td>
-						<td>
-							<div class="btn-group pull-right search-result-controls" data-toggle="buttons-radio">
-								<button title="{{ venue.relevance }}" type="button" class="btn btn-large{% if relevant %} active{% endif %}">
-									<i class="icon-home"></i>
-									это дом
-								</button>
-								<button type="button" class="btn btn-large{% if not relevant %} active{% endif %}">
-									<i class="icon-ok"></i>
-									все ОК
-								</button>
-							</div>
-						</td>
-					</tr>
-				</table>
+				<div class="row-fluid search-result{% if not relevant %} irrelevant{% endif %}">
+					<div class="search-result-content">
+						<img class="search-result-icon" src="{{ venue.icon[0] + 'bg_44' + venue.icon[1] }}" alt="{{ venue.categories }}" title="{{ venue.categories }}">
+						<h4 class="search-result-header"><a href="{{ venue.url }}">{{ venue.name }}</a></h4>
+						<div class="search-result-description">
+							<span>{{ venue.categories }}</span>
+							<span class="search-result-address muted">{{ venue.address }}</span>
+						</div>
+						<div class="search-result-stats">
+							<span class="search-result-stats__checkins">{{ venue.checkins }}</span>
+							<span><i class="icon-user icon"></i>{{ venue.users }}</span>
+							<span {% if not venue.tips %}class="muted"{% endif %}><i class="icon-comment icon"></i>{{ venue.tips }}</span>
+							<span {% if not venue.likes %}class="muted"{% endif %}><i class="icon-heart icon"></i>{{ venue.likes }}</span>
+							<span {% if not venue.photos %}class="muted"{% endif %}><i class="icon-camera icon"></i>{{ venue.photos }}</span>
+						</div>
+						<div class="btn-group search-result-controls" data-toggle="buttons-radio">
+							<button title="{{ venue.relevance }}" type="button" class="4sq-checked btn btn-large{% if relevant %} active{% endif %}">
+								<i class="icon-home"></i>
+								это дом
+							</button>
+							<button type="button" class="btn btn-large{% if not relevant %} active{% endif %}">
+								<i class="icon-ok"></i>
+								все ОК
+							</button>
+						</div>
+					</div>
+				</div>
 				{% endfor %}
 			</div>
 			<div class="span3 infobox muted">
@@ -59,11 +59,31 @@
 <div class="row">
 	<div class="span9">
 		<a href="#/go!" class="btn btn-large btn-info pull-right button-results-submit" type="button">
-			Отправить {{ relevant_count }} мест на проверку
+			Отправить <span id="4sq-send-title">{{ relevant_count }} мест</span> на проверку
 		</a>
 	</div>
 </div>
 <footer class="row footer">
 	<img class="pull-right footer__foursquare-powered" src="https://playfoursquare.s3.amazonaws.com/press/logo/poweredByFoursquare_gray.png">
 </footer>
+{% endblock %}
+{% block scripts %}
+<script>
+$(document).ready(function(){
+	var declension = function(number, titles) {
+		return titles[(number % 100 > 4 && number % 100 < 20) ? 2 : [2, 0, 1, 1, 1, 2][(number % 10 < 5) ? number % 10 : 5]];
+	}
+	var renderSendButtonText = function(number) {
+		$("#4sq-send-title").text(number + ' ' + declension(number, ['место', 'места', 'мест']));
+	};
+	$(".search-result-controls .btn").on("click", function(event) {
+		setTimeout(function() {
+			renderSendButtonText($(".4sq-checked.active").size())
+		}, 100);
+	});
+
+	// Setup
+	renderSendButtonText({{ relevant_count }});
+});
+</script>
 {% endblock %}
