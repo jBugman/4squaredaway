@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-import json
 
 
 class Venue(object):
@@ -36,21 +35,6 @@ class Venue(object):
                 categories.append(cat['name'])
         return primary, icon, [primary] + categories
 
-    def __iter__(self):
-        # Поля, например, для CSV
-        yield self.name
-        yield self.categories
-        yield self.checkins
-        yield self.users
-        yield self.tips
-        yield self.likes
-        yield self.specials
-        yield self.city
-        yield self.address
-        yield self.id
-
-        yield self.relevance
-
 
 class Category(object):
     def __init__(self, category):
@@ -59,7 +43,11 @@ class Category(object):
         self.categories = [Category(x) for x in category.get('categories', [])]
 
     @classmethod
-    def cleanup(cls, categories):
+    def list_from_json(cls, source):
+        return cls._filter(cls._cleanup(source['categories']))
+
+    @classmethod
+    def _cleanup(cls, categories):
         for c in categories:
             c.pop('pluralName', None)
             c.pop('shortName', None)
@@ -67,13 +55,13 @@ class Category(object):
             if icon:
                 c['icon'] = icon['prefix'] + 'bg_32' + icon['suffix']
             if 'categories' in c:
-                cls.cleanup(c['categories'])
+                cls._cleanup(c['categories'])
                 if not c['categories']:
                     c.pop('categories', None)
         return categories
 
     @classmethod
-    def filter(cls, categories):
+    def _filter(cls, categories):
         result = []
         for c in categories:
             if c['id'] != '4e67e38e036454776db1fb3a':

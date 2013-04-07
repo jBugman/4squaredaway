@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 from operator import attrgetter
+from itertools import chain
 
 from gevent.pool import Pool
 
@@ -18,18 +19,19 @@ class Magic(object):
         self.api = FoursquareAPI()
 
     def get_venues_magically(self):
+        categories = self.api.get_categories_filter()
         pool = Pool(GEVENT_POOL_SIZE)
         result = pool.map(
             lambda x: self.api.search(
-                x,
-                self.api.categories_filter
+                search_term=x,
+                categories=categories
             ).get('venues', []),
             self.keywords
         )
         # Flatten mapped list and remove duplicates via temp dict
         raw_venues = {
             x['id']: x for x in
-            [item for sublist in result for item in sublist]
+            chain.from_iterable(result)
         }.values()
         venues = [self.with_relevance(Venue(x)) for x in raw_venues]
         venues.sort(key=attrgetter('checkins'), reverse=True)
