@@ -16,8 +16,8 @@ from fsqaway.shapes import Point, Rect
 
 SEARCH_INTENT = 'browse'
 SEARCH_RADIUS = 1500
-COORDS_CENTER = Point(55.7517, 37.6178)
-COORDS_RADIUS = 0.25
+MOSCOW_CENTER = Point(55.7517, 37.6178)
+MOSCOW_RADIUS = 0.25
 
 
 class FoursquareAPI(object):
@@ -30,12 +30,17 @@ class FoursquareAPI(object):
         self.cache = Cache()
 
     def search(self, search_term, categories):
-        coords = ','.join((str(x) for x in self.get_random_coords()))
-        self.logger.debug('API call \'%s\' coords=%s' % (search_term, coords))
+        bounds = Rect.rect_with_center_and_halfsize(
+            MOSCOW_CENTER,
+            MOSCOW_RADIUS
+        )
+        self.logger.debug(u'API::search \'{}\' with bounds {}'.format(
+            search_term, bounds
+        ))
         return self.fsq.venues.search(params={
             'intent': SEARCH_INTENT,
-            'll': coords,
-            'radius': SEARCH_RADIUS,
+            'sw': bounds.sw,
+            'ne': bounds.ne,
             'query': search_term.encode('UTF-8'),
             'limit': 50,
             'categoryId': categories,
@@ -46,20 +51,8 @@ class FoursquareAPI(object):
         if self.cache.exists(KEY):
             return self.cache.get(KEY)
 
-        self.logger.debug('API call \'Categories\'')
+        self.logger.debug('API::Categories')
         categories = Category.list_from_json(self.fsq.venues.categories())
         result = ','.join((x['id'] for x in categories))
         self.cache.put(KEY, result, CATEGORIES_LIST_CACHE_TIMEOUT)
         return result
-
-    def get_random_coords(self, center=COORDS_CENTER, radius=COORDS_RADIUS):
-        while True:
-            point = Point(
-                random.uniform(-radius, radius),
-                random.uniform(-radius, radius),
-            )
-            if math.hypot(point.x, point.y) <= radius:
-                return (
-                    center.x + point.x,
-                    center.y + point.y
-                )
