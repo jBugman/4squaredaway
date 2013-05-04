@@ -3,6 +3,7 @@ import random
 import math
 
 from foursquare import Foursquare
+import requests
 
 from fsqaway.log import get_logger
 from fsqaway.config import (
@@ -15,6 +16,7 @@ from fsqaway.shapes import Point, Rect
 from fsqaway.dao.models.user import User
 
 
+LOGIN_REDIRECT_URI = 'http://4squaredaway.ru/login'
 SEARCH_INTENT = 'browse'
 SEARCH_RADIUS = 1500
 MOSCOW_CENTER = Point(55.7517, 37.6178)
@@ -27,12 +29,28 @@ class FoursquareAPI(object):
         self.fsq = Foursquare(
             client_id=FOURSQUARE_CLIENT_ID,
             client_secret=FOURSQUARE_CLIENT_SECRET,
-            redirect_uri='http://4squaredaway.ru/login'
+            redirect_uri=LOGIN_REDIRECT_URI
         )
         self.cache = Cache()
 
-    def auth(self, code):
-        access_token = self.fsq.oauth.get_token(code)
+    # TODO: разобраться, в чем дело
+    # def auth(self, access_code):
+    #     access_token = self.fsq.oauth.get_token(access_code)
+    #     self.fsq.set_access_token(access_token)
+
+    def auth(self, access_code):
+        resp = requests.get(
+            'https://foursquare.com/oauth2/access_token',
+            params={
+                'client_id': FOURSQUARE_CLIENT_ID,
+                'client_secret': FOURSQUARE_CLIENT_SECRET,
+                'grant_type': 'authorization_code',
+                'redirect_uri': LOGIN_REDIRECT_URI,
+                'code': access_code,
+            }
+        ).json()
+        self.logger.debug(resp)
+        access_token = resp['access_token']
         self.fsq.set_access_token(access_token)
 
     @property
