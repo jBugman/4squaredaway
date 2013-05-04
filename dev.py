@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 from fsqaway.wsgi import app
 from fsqaway.config import HTTP_PORT, DEBUG

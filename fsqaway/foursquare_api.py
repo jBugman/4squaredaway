@@ -12,6 +12,7 @@ from fsqaway.config import (
 from fsqaway.models import Category
 from fsqaway.cache import Cache
 from fsqaway.shapes import Point, Rect
+from fsqaway.dao.models.user import User
 
 
 SEARCH_INTENT = 'browse'
@@ -25,9 +26,22 @@ class FoursquareAPI(object):
         self.logger = get_logger(__name__)
         self.fsq = Foursquare(
             client_id=FOURSQUARE_CLIENT_ID,
-            client_secret=FOURSQUARE_CLIENT_SECRET
+            client_secret=FOURSQUARE_CLIENT_SECRET,
+            redirect_uri='http://4squaredaway.ru/login'
         )
         self.cache = Cache()
+
+    def auth(self, code):
+        access_token = self.fsq.oauth.get_token(code)
+        self.fsq.set_access_token(access_token)
+
+    @property
+    def auth_url(self):
+        return self.fsq.oauth.auth_url()
+
+    def get_current_user(self):
+        json_response = self.fsq.users()
+        return User(json_user=json_response['user'])
 
     def search(self, search_term, categories):
         bounds = Rect.rect_with_center_and_halfsize(

@@ -34,8 +34,14 @@
 							<li class=""><a href="{{ url_for('venue_magic') }}">По-волшебству</a></li>
 						</ul>
 						<p class="navbar-text pull-right">
-							<img class="user-avatar" src="http://www.gravatar.com/avatar/1751847584b94e0027e5a2feb1921550.png?size=32">
-							<a href="#/user" class="navbar-link">Sergey Parshukov</a>
+							{% if not user%}
+							<a href="{{ url_for('login') }}" class="navbar-link">Вход</a>
+							{% else %}
+							<img class="user-avatar" src="{{ user.userpic }}">
+							<a href="{{ user.url }}" class="navbar-link">{{ user.name }}</a>
+							{% endif %}
+							<!-- <img class="user-avatar" src="http://www.gravatar.com/avatar/1751847584b94e0027e5a2feb1921550.png?size=32">
+							<a href="{{ url_for('login') }}" class="navbar-link">Sergey Parshukov</a> -->
 						</p>
 						<p class="navbar__legal navbar-text pull-right">
 							<a href="#/legal" class="navbar-link">Пользовательское соглашение</a>

@@ -25,3 +25,7 @@ setproctitle==1.1.7
 Flask-Assets==0.8
 webassets==0.8
 cssmin==0.1.4
+
+Flask-KVSession==0.3.2
+itsdangerous==0.17
+simplekv==0.6
