@@ -80,7 +80,7 @@ def fsq_auth(f):  # pragma: no cover
 
 @app.route('/login')
 def login():
-    redirect_response = flask.redirect(flask.url_for('bootstrap'))  # FIXME
+    redirect_response = flask.redirect(flask.url_for('index'))
 
     user = get_user_from_session()
     if user is not None:
