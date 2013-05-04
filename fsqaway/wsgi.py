@@ -2,8 +2,9 @@
 from gevent import monkey
 monkey.patch_all()
 
+from functools import wraps
+
 import flask
-from flask.ext.basicauth import BasicAuth
 from flask.ext.assets import Environment, Bundle
 from flaskext.kvsession import KVSessionExtension
 
@@ -11,8 +12,10 @@ from fsqaway.log import get_logger
 from fsqaway.foursquare_api import FoursquareAPI
 from fsqaway.magic import Magic, THRESHOLD
 from fsqaway.dao import kvstore
+from fsqaway.config import ALLOWED_USERS
 
 
+SESSION_TOKEN_KEY = 'token'
 SESSION_USER_KEY = 'user'
 
 
@@ -25,22 +28,54 @@ app = flask.Flask(
 )
 app.logger.handlers = []
 app.config.from_object('fsqaway.config')
-basic_auth = BasicAuth(app)
 assets = Environment(app)
 KVSessionExtension(kvstore.get_kvstore(), app)
 
-api = FoursquareAPI()
-magic = Magic()
-
-
-@app.route('/')
-@basic_auth.required
-def index():
-    return flask.render_template('index.html')
+_api = FoursquareAPI()
 
 
 def get_user_from_session():
     return flask.session.get(SESSION_USER_KEY, None)
+
+
+def get_token_from_session():
+    return flask.session.get(SESSION_TOKEN_KEY, None)
+
+
+def get_api():
+    token = get_token_from_session()
+    if token is not None:
+        return _api.set_token(token)
+    else:
+        return _api
+
+
+def get_magic():
+    return Magic(foursquare_api=get_api())
+
+
+def update_user_in_session():
+    user = get_api().get_current_user()
+    flask.session[SESSION_USER_KEY] = user
+    return user
+
+
+def fsq_auth(f):  # pragma: no cover
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = get_token_from_session()
+        if token is None:
+            return flask.redirect(flask.url_for('login'))
+
+        user = get_user_from_session()
+        if user is None:
+            user = update_user_in_session()
+
+        if not (user.id in ALLOWED_USERS):
+            flask.abort(403)
+
+        return f(*args, **kwargs)
+    return decorated
 
 
 @app.route('/login')
@@ -53,12 +88,11 @@ def login():
 
     access_code = flask.request.args.get('code', None)
     if access_code is not None:
-        api.auth(access_code)
-        user = api.get_current_user()
-        flask.session[SESSION_USER_KEY] = user
+        flask.session[SESSION_TOKEN_KEY] = _api.auth(access_code)
+        update_user_in_session()
         return redirect_response
 
-    return flask.redirect(api.auth_url)
+    return flask.redirect(get_api().auth_url)
 
 
 @app.route('/logout')
@@ -70,8 +104,14 @@ def logout():
     return flask.redirect(flask.url_for('index'))
 
 
+@app.route('/')
+@fsq_auth
+def index():
+    return flask.render_template('index.html')
+
+
 @app.route('/bootstrap')
-@basic_auth.required
+@fsq_auth
 def bootstrap():
     _MOCK_TOTAL_COUNT = 15
     _MOCK_RELEVANT_COUNT = 3
@@ -101,10 +141,10 @@ def bootstrap():
 
 
 @app.route('/magic')
-@basic_auth.required
+@fsq_auth
 def venue_magic():
     logger.debug('/magic')
-    result = magic.get_venues_magically()
+    result = get_magic().get_venues_magically()
     return flask.render_template(
         'magic.html',
         venues=result,

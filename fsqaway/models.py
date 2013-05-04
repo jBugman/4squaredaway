@@ -8,14 +8,15 @@ class Venue(object):
         self.checkins = venue['stats']['checkinsCount']
         self.users = venue['stats']['usersCount']
         self.tips = venue['stats']['tipCount']
-        self.likes = venue['likes']['count']
+        self.likes = 0  # venue['likes']['count']  # FIXME
         self.specials = venue['specials']['count']
         self.city = venue['location'].get('city', '')
         self.address = venue['location'].get('address', '')
         self.id = venue['id']
 
-        photos = venue.get('photos', None)
-        self.photos = photos.get('count', 0) if photos else 0
+        # FIXME
+        # photos = venue.get('photos', None)
+        self.photos = 0  # photos.get('count', 0) if photos else 0
 
         _, icon, categories = self._get_categories(venue)
         self.icon = (icon['prefix'], icon['suffix'])

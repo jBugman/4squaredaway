@@ -24,13 +24,15 @@ MOSCOW_RADIUS = 0.25
 
 
 class FoursquareAPI(object):
-    def __init__(self):
+    def __init__(self, access_token=None):
         self.logger = get_logger(__name__)
         self.fsq = Foursquare(
             client_id=FOURSQUARE_CLIENT_ID,
             client_secret=FOURSQUARE_CLIENT_SECRET,
             redirect_uri=LOGIN_REDIRECT_URI
         )
+        if access_token is not None:
+            self.set_token(access_token)
         self.cache = Cache()
 
     # TODO: разобраться, в чем дело
@@ -51,7 +53,12 @@ class FoursquareAPI(object):
         ).json()
         self.logger.debug(resp)
         access_token = resp['access_token']
+        self.set_token(access_token)
+        return access_token
+
+    def set_token(self, access_token):
         self.fsq.set_access_token(access_token)
+        return self
 
     @property
     def auth_url(self):

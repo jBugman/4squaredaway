@@ -4,8 +4,6 @@ from itertools import chain
 
 from gevent.pool import Pool
 
-from fsqaway.log import get_logger
-from fsqaway.foursquare_api import FoursquareAPI
 from fsqaway.models import Venue
 from fsqaway.config import GEVENT_POOL_SIZE
 
@@ -14,9 +12,8 @@ THRESHOLD = 5
 
 
 class Magic(object):
-    def __init__(self):
-        self.logger = get_logger(__name__)
-        self.api = FoursquareAPI()
+    def __init__(self, foursquare_api):
+        self.api = foursquare_api
 
     def get_venues_magically(self):
         categories = self.api.get_categories_filter()
