@@ -9,6 +9,8 @@ SECRET_KEY = '4sqawsecretkey'
 CACHE_TYPE = 'redis'
 CACHE_DATABASE = 1
 
+MONGODB_DATABASE = 'fsqaway'
+
 SENTRY_DSN = ''
 USE_SENTRY = False
 

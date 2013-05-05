@@ -4,8 +4,9 @@ from itertools import chain
 
 from gevent.pool import Pool
 
-from fsqaway.models import Venue
 from fsqaway.config import GEVENT_POOL_SIZE
+from fsqaway.dao.models import Venue
+from fsqaway.dao.database import db
 
 
 THRESHOLD = 5
@@ -27,10 +28,18 @@ class Magic(object):
         )
         # Flatten mapped list and remove duplicates via temp dict
         raw_venues = {
-            x['id']: x for x in
-            chain.from_iterable(result)
+            x['id']: x for x in chain.from_iterable(result)
         }.values()
-        venues = [self.with_relevance(Venue(x)) for x in raw_venues]
+
+        venues = [
+            self.with_relevance(db.Venue.find_and_modify(
+                query={'id': v['id']},
+                update=Venue().from_json(v),
+                upsert=True,
+                new=True
+            )) for v in raw_venues
+        ]
+
         venues.sort(key=attrgetter('checkins'), reverse=True)
         venues.sort(key=attrgetter('relevance'), reverse=True)
         return venues

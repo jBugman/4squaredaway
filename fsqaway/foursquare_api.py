@@ -13,12 +13,13 @@ from fsqaway.config import (
 from fsqaway.models import Category
 from fsqaway.cache import Cache
 from fsqaway.shapes import Point, Rect
-from fsqaway.dao.models.user import User
+from fsqaway.dao.models import User
 
 
 LOGIN_REDIRECT_URI = 'http://4squaredaway.ru/login'
 SEARCH_INTENT = 'browse'
 SEARCH_RADIUS = 1500
+SEARCH_CATEGORY_LIMIT = 25
 MOSCOW_CENTER = Point(55.7517, 37.6178)
 MOSCOW_RADIUS = 0.25
 
@@ -81,7 +82,7 @@ class FoursquareAPI(object):
             'sw': bounds.sw,
             'ne': bounds.ne,
             'query': search_term.encode('UTF-8'),
-            'limit': 50,
+            'limit': SEARCH_CATEGORY_LIMIT,
             'categoryId': categories,
         })
 
