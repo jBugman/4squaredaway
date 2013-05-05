@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" ng-app="app">
 	<head>
 		<meta charset="utf-8">
 		<title>{% block title %}4squaredaway{% endblock %}</title>
@@ -40,8 +40,6 @@
 							<img class="user-avatar" src="{{ user.userpic }}">
 							<a href="{{ user.url }}" class="navbar-link">{{ user.name }}</a>
 							{% endif %}
-							<!-- <img class="user-avatar" src="http://www.gravatar.com/avatar/1751847584b94e0027e5a2feb1921550.png?size=32">
-							<a href="{{ url_for('login') }}" class="navbar-link">Sergey Parshukov</a> -->
 						</p>
 						<p class="navbar__legal navbar-text pull-right">
 							<a href="#/legal" class="navbar-link">Пользовательское соглашение</a>
@@ -54,7 +52,7 @@
 		{% block content %}{% endblock %}
 		</div>
 	</body>
-	<script src="//yandex.st/jquery/1.9.1/jquery.min.js"></script>
-	<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js"></script>
+	<script src="{{ url_for('static', filename='js/ui-bootstrap-tpls-0.3.0.min.js') }}"></script>
 	{% block scripts %}{% endblock %}
 </html>
