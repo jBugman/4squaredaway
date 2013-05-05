@@ -5,11 +5,16 @@ from itertools import chain
 from gevent.pool import Pool
 
 from fsqaway.config import GEVENT_POOL_SIZE
+from fsqaway.log import get_logger
 from fsqaway.dao.models import Venue
 from fsqaway.dao.database import db
 
 
 THRESHOLD = 5
+SEARCH_CATEGORY_LIMIT = 15
+REVIEWS_THRESHOLD = 1
+
+logger = get_logger(__name__)
 
 
 class Magic(object):
@@ -22,7 +27,8 @@ class Magic(object):
         result = pool.map(
             lambda x: self.api.search(
                 search_term=x,
-                categories=categories
+                categories=categories,
+                per_category_limit=SEARCH_CATEGORY_LIMIT
             ).get('venues', []),
             self.keywords
         )
@@ -31,20 +37,29 @@ class Magic(object):
             x['id']: x for x in chain.from_iterable(result)
         }.values()
 
-        venues = [
-            self.with_relevance(db.Venue.find_and_modify(
-                query={'id': v['id']},
-                update=Venue().from_json(v),
-                upsert=True,
-                new=True
-            )) for v in raw_venues
-        ]
+        venues = []
+        for raw_venue in raw_venues:
+            query = {'id': raw_venue['id']}
+            venue = db.Venue.find_one(query)
+
+            if venue is None:
+                venue = db.Venue()
+                venue = venue.from_json(raw_venue)
+                venue.save()
+
+            venue = self.add_relevance(venue)
+
+            if venue.reviewed <= REVIEWS_THRESHOLD:
+                venues.append(venue)
+            else:
+                logger.info('Filtered ' + venue.id)
+        logger.info('Remaining: {}'.format(len(venues)))
 
         venues.sort(key=attrgetter('checkins'), reverse=True)
         venues.sort(key=attrgetter('relevance'), reverse=True)
         return venues
 
-    def with_relevance(self, venue):
+    def add_relevance(self, venue):
         r = 0
         if venue.checkins > 10:
             r += 1

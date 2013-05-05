@@ -19,7 +19,6 @@ from fsqaway.dao.models import User
 LOGIN_REDIRECT_URI = 'http://4squaredaway.ru/login'
 SEARCH_INTENT = 'browse'
 SEARCH_RADIUS = 1500
-SEARCH_CATEGORY_LIMIT = 25
 MOSCOW_CENTER = Point(55.7517, 37.6178)
 MOSCOW_RADIUS = 0.25
 
@@ -69,7 +68,7 @@ class FoursquareAPI(object):
         json_response = self.fsq.users()
         return User(json_user=json_response['user'])
 
-    def search(self, search_term, categories):
+    def search(self, search_term, categories, per_category_limit):
         bounds = Rect.rect_with_center_and_halfsize(
             MOSCOW_CENTER,
             MOSCOW_RADIUS
@@ -82,7 +81,7 @@ class FoursquareAPI(object):
             'sw': bounds.sw,
             'ne': bounds.ne,
             'query': search_term.encode('UTF-8'),
-            'limit': SEARCH_CATEGORY_LIMIT,
+            'limit': per_category_limit,
             'categoryId': categories,
         })
 

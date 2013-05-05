@@ -26,7 +26,7 @@
 						<img class="search-result-icon" src="{{ venue.icon[0] + 'bg_44' + venue.icon[1] }}" alt="{{ venue.categories }}" title="{{ venue.categories }}">
 						<h4 class="search-result-header"><a href="{{ venue.url }}">{{ venue.name }}</a></h4>
 						<div class="search-result-description">
-							<span>{{ venue.categories }}</span>
+							<span>{{ venue.categories | join(', ') }}</span>
 							<span class="search-result-address muted">{{ venue.address }}</span>
 						</div>
 						<div class="search-result-stats">

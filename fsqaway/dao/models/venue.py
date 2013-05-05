@@ -24,11 +24,15 @@ class Venue(Document):  # pragma: no cover
         'address': basestring,
         'icon': (basestring, basestring),
         'categories': [basestring],
+
+        'reviewed': int,
     }
     default_values = {
         'likes': 0,
         'photos': 0,
         'specials': 0,
+
+        'reviewed': 0,
     }
     indexes = [
         {'fields': 'id'},
@@ -47,15 +51,7 @@ class Venue(Document):  # pragma: no cover
 
         _, icon, categories = self._get_categories(venue)
         self.icon = (icon['prefix'], icon['suffix'])
-        self.categories = ', '.join(categories)
-
-        # FIXME
-        self.photos = 0  # photos = venue.get('photos', None) photos.get('count', 0) if photos else 0
-        # FIXME
-        self.likes = 0  # venue['likes']['count']
-
-        self.relevance = 0
-
+        self.categories = categories
         return self
 
     def _get_categories(self, venue):
@@ -69,7 +65,3 @@ class Venue(Document):  # pragma: no cover
             else:
                 categories.append(cat['name'])
         return primary, icon, [primary] + categories
-
-    @property
-    def categories_string(self):
-        return ', '.join(self.categories)
