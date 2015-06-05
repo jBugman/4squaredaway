@@ -22,8 +22,7 @@ CATEGORIES_LIST_CACHE_TIMEOUT = 8 * 3600
 GEVENT_POOL_SIZE = 10
 
 ALLOWED_USERS = (
-    '23245433',  # Sergey Parshukov
-    '17699551',  # Tyoma Kazakov
+    '0000000'
 )
 
 try:
